@@ -1,13 +1,14 @@
-#ifndef JSOCKET_H
-#define	JSOCKET_H
+#ifndef JSSOCKET_H
+#define	JSSOCKET_H
 
 #define MAX_TCP_SIZE 32768
 
-#define jsocket_no_err 0
-#define jsocket_err_init -1
-#define jsocket_err_unknown_host -2
-#define jsocket_err_open_socket -3
-#define jsocket_err_connect_socket -4
+#define jssocket_no_err 0
+#define jssocket_err_init -1
+//#define jssocket_err_unknown_host -2
+#define jssocket_err_open_socket -3
+#define jssocket_err_bind_socket -4
+#define jssocket_err_listen_socket -5
 
 #include <iostream>
 #include <cstring>
@@ -26,28 +27,44 @@
 
 using namespace std;
 
-class jsocket {
+class jssocket;
+class jssocketconn;
+
+class jssocket {
 private:
     static bool started;
     int connerror;
+    int queue;
     int mysocket;
-    struct hostent *hostinfo;
     struct sockaddr_in server_addr;
-    void init(const char *host, int port);
+    void init(int port);
     void connect_disconnected();
 public:
-    jsocket(const char *host, int port);
-    jsocket(string host, int port);
-    ~jsocket();
+    jssocket(int port,int queue_size);
+    ~jssocket();
     
     int getconnerror();
     void reconnect();
     void disconnect();
+    jssocketconn* connect_client();
+};
+
+
+class jssocketconn
+{
+friend class jssocket;
+private:
+    struct sockaddr_in client_addr;
+    int connection;
+    jssocketconn(int mysocket);
+public:
+    ~jssocketconn();
+    void close_conn();
     int sync_send(const void* pointer, int size);
     int sync_send_string(string str);
     int sync_send_cstring(const char* pointer);
     int sync_rec(const void* pointer, int maxsize);
-    
 };
 
-#endif
+#endif	/* JSSOCKET_H */
+

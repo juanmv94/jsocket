@@ -77,7 +77,7 @@ void jsocket::reconnect()
 void jsocket::disconnect()
 {
     #ifdef WIN32
-    shutdown(mysocket, SD_SEND);        //we are not capturing errors
+    shutdown(mysocket, SD_BOTH);        //we are not capturing errors
     closesocket(mysocket);
     #else
     close(mysocket);
