@@ -26,7 +26,7 @@ void jsocket::init(const char* host, int port)
 {    
     if (!started)
     {
-        #ifdef WIN32
+        #ifdef _WIN32
         WSADATA wsadata;
         if (WSAStartup(MAKEWORD(1,1), &wsadata) == SOCKET_ERROR)  // Initialize Winsock version 1.1
         {
@@ -76,7 +76,7 @@ void jsocket::reconnect()
 
 void jsocket::disconnect()
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     shutdown(mysocket, SD_BOTH);        //we are not capturing errors
     closesocket(mysocket);
     #else
@@ -86,7 +86,7 @@ void jsocket::disconnect()
 
 int jsocket::sync_send(const void* pointer, int size)
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     return send(mysocket, (char*)pointer, size, 0);
     #else
     return write(mysocket, (char*)pointer, size);
@@ -105,7 +105,7 @@ int jsocket::sync_send_cstring(const char* pointer)
 
 int jsocket::sync_rec(const void *pointer, int maxsize)
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     return recv(mysocket, (char*)pointer, maxsize, 0);
     #else
     return read(mysocket, (char*)pointer, maxsize);

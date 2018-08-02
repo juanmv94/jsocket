@@ -12,14 +12,14 @@
 
 #include <iostream>
 #include <cstring>
-#ifdef WIN32
+#ifdef _WIN32
 #include <winsock2.h>
 #else
 #include <netdb.h>
-//#include <arpa/inet.h>
+#include <arpa/inet.h>
 //#include <errno.h>
 //#include <fcntl.h>
-//#include <netinet/in.h>
+#include <netinet/in.h>
 //#include <signal.h>
 //#include <sys/socket.h>
 #include <unistd.h>
@@ -37,10 +37,10 @@ private:
     int queue;
     int mysocket;
     struct sockaddr_in server_addr;
-    void init(int port);
+    void init(int port, bool onlylocal);
     void connect_disconnected();
 public:
-    jssocket(int port,int queue_size);
+    jssocket(int port,int queue_size, bool onlylocal);
     ~jssocket();
     
     int getconnerror();
@@ -64,6 +64,7 @@ public:
     int sync_send_string(string str);
     int sync_send_cstring(const char* pointer);
     int sync_rec(const void* pointer, int maxsize);
+    string getip();
 };
 
 #endif	/* JSSOCKET_H */

@@ -40,17 +40,19 @@ Here is a list of the methods for a jsocket object:
 
 ## JServerSocket classes (servers)
 ### jssocket
-Just create a jssocket object with a port, and a client queue size, and JServerSocket will bind and start to listen at the port!
+Just create a jssocket object with a port, and a client queue size, and JServerSocket will bind and start to listen at the port accepting or not remote connections (bool onlylocal).
 
-Example: `jssocket(80, 0);`
+Example: `jssocket(80, 0, false);`
 
 * **int getconnerror()**: gets an integer with a defined connection error after object creation or reconnect() call. It returns *jssocket\_no\_err*(==0) if connection was sucessful. You can check the full error define list in jssocket.h.
 * **void reconnect()**: unbinds and binds again to the same port. Useful if there was a bind error creating the *jssocket* object and you dont want to create a new one. 
 * **void disconnect()**: unbinds the port
 * **jssocketconn\* connect_client()**: this is the only way to get a *jssocketconn*. After jssocket object creation (port bind) without errors (*jssocket\_no\_err*(==0)) You should call this function to get the next client connection.
 
-###jssocketconn
+### jssocketconn
 * **void close_conn()**: closes the client connection.
+
+* **string getip()**: gets a string with the client IP.
 
 The following are equivalent to the jsocket functions:
  

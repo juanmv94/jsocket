@@ -4,8 +4,8 @@ using namespace std;
 int main(int argc, char** argv) {
 
     char buffer[MAX_TCP_SIZE];
-    jssocket jss(1234,0);				 //Puerto 1234, sin cola de clientes esperando ser atendidos (tamaño 0)
-	switch (jss.getconnerror())          //comprobamos si ha habido algun error al conectar
+    jssocket jss(1234,0,false);		//Puerto 1234, sin cola de clientes esperando ser atendidos (tamaño 0), aceptamos peticiones remotas
+	switch (jss.getconnerror())		//comprobamos si ha habido algun error al conectar
     {
         case jssocket_no_err:
             cout<<"Conexion correcta\n\n";
@@ -29,12 +29,12 @@ int main(int argc, char** argv) {
     while(1)
     {
         jssocketconn* c=jss.connect_client();
-        cout<<"conectado\n";
+        cout<<"conectado "<<c->getip()<<"\n";
         int r;
         while((r=c->sync_rec(buffer,MAX_TCP_SIZE))>0)
             c->sync_send(buffer,r);
-        delete c;
-        cout<<"desconectado\n";
+        cout<<"desconectado "<<c->getip()<<"\n";
+		delete c;
     }
     return 0;
 }

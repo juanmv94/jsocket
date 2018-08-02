@@ -6,8 +6,8 @@
 
 bool jssocket::started=false;
 
-jssocket::jssocket(int port, int queue_size) : queue(queue_size) {
-    init(port);
+jssocket::jssocket(int port, int queue_size, bool onlylocal) : queue(queue_size) {
+    init(port,onlylocal);
 }
 
 jssocket::~jssocket()
@@ -20,11 +20,11 @@ int jssocket::getconnerror()
    return connerror; 
 }
 
-void jssocket::init(int port)
+void jssocket::init(int port,bool onlylocal)
 {    
     if (!started)
     {
-        #ifdef WIN32
+        #ifdef _WIN32
         WSADATA wsadata;
         if (WSAStartup(MAKEWORD(1,1), &wsadata) == SOCKET_ERROR)  // Initialize Winsock version 1.1
         {
@@ -37,7 +37,18 @@ void jssocket::init(int port)
     
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons (port);
-    //server_addr.sin_addr = htonl(INADDR_ANY);
+    if (onlylocal)
+        #ifdef _WIN32
+        server_addr.sin_addr={{127,0,0,1}};
+        #else
+        inet_aton("127.0.0.1",&server_addr.sin_addr);
+        #endif
+    else
+        #ifdef _WIN32
+        server_addr.sin_addr={{0,0,0,0}};
+        #else
+        inet_aton("0.0.0.0",&server_addr.sin_addr);
+        #endif
     
     connect_disconnected();
 }
@@ -72,7 +83,7 @@ void jssocket::reconnect()
 
 void jssocket::disconnect()
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     shutdown(mysocket, SD_BOTH);        //we are not capturing errors
     closesocket(mysocket);
     #else
@@ -91,7 +102,7 @@ jssocketconn* jssocket::connect_client()
 
 jssocketconn::jssocketconn(int mysocket)
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     int client_addr_length = sizeof(client_addr);
     #else
     unsigned int client_addr_length = sizeof(client_addr);
@@ -106,7 +117,7 @@ jssocketconn::~jssocketconn()
 
 void jssocketconn::close_conn()
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     shutdown(connection, SD_BOTH);        //we are not capturing errors
     closesocket(connection);
     #else
@@ -116,7 +127,7 @@ void jssocketconn::close_conn()
 
 int jssocketconn::sync_send(const void* pointer, int size)
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     return send(connection, (char*)pointer, size, 0);
     #else
     return write(connection, (char*)pointer, size);
@@ -135,9 +146,15 @@ int jssocketconn::sync_send_cstring(const char* pointer)
 
 int jssocketconn::sync_rec(const void *pointer, int maxsize)
 {
-    #ifdef WIN32
+    #ifdef _WIN32
     return recv(connection, (char*)pointer, maxsize, 0);
     #else
     return read(connection, (char*)pointer, maxsize);
     #endif
+}
+
+string jssocketconn::getip()
+{
+    string res;
+    return res.assign(inet_ntoa(client_addr.sin_addr));
 }
