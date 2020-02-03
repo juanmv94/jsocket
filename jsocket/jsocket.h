@@ -12,6 +12,8 @@
 #include <iostream>
 #include <cstring>
 #ifdef _WIN32
+#pragma comment(lib, "Ws2_32.lib")
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <winsock2.h>
 #else
 #include <netdb.h>
