@@ -30,6 +30,7 @@ using namespace std;
 
 class jsocket {
 private:
+    jsocket(const jsocket&);
     static bool started;
     int connerror;
     int mysocket;
